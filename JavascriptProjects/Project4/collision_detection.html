@@ -1,0 +1,29 @@
+<script>
+    var rect1 = {x: 5, y: 5, width: 50, height: 50};
+    var rect2 = {x: 20, y: 10, width: 10, height: 10};
+
+    // collision algorithm 1
+    if(rect1.x < rect2.x + rect2.width &&           // rect1 top left point is less than rect2 top right point
+        rect1.x + rect1.width > rect.x &&           // rect1 top right is to the right of rect2 top left 
+        rect1.y < rect2.y + rect2.height &&         // rect1 top left is above rect2 bottom left
+        rect1.y + rect1.height > rect2.y) {         // rect1 bottom left is below rect2 top left
+        // collision detected
+
+    } else {
+        // no collision
+
+    }
+
+    // collision algorithm 2
+    if(rect1.x > rect2.x + rect2.width ||           // rect1 top-left is more than rect 2 top-right
+        rect1.x + rect1.width < rect.x ||           // rect1 top-right is less than rect2 top-left
+        rect1.y < rect2.y + rect2.height ||         // rect1 top-left more than rect2 bottom-left
+        rect1.y + rect1.height < rect2.y)           // rect1 bottom-left is less than rect2 top-left
+        {         
+        // no collision
+
+    } else {
+        // collision detected
+
+    }
+</script>
