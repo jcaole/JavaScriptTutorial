@@ -3,6 +3,16 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+const collisionCanvas = document.getElementById('collisionCanvas');
+const collisionCtx = collisionCanvas.getContext('2d');
+collisionCanvas.width = window.innerWidth;
+collisionCanvas.height = window.innerHeight;
+
+// score
+let score = 0;
+let gameOver = false;
+ctx.font = '50px Impact';
+
 //helper variables
 let timeToNextRaven = 0;
 let ravenInterval = 500;    // 500ms
@@ -14,7 +24,7 @@ class Raven {
     constructor() {
         this.spriteWidth = 271;
         this.spriteHeight = 194;
-        this.sizeModifier = Math.random() * 0.1 + 1;
+        this.sizeModifier = Math.random() * 0.2 + 1;
         this.width = this.spriteWidth * this.sizeModifier;
         this.height = this.spriteHeight * this.sizeModifier;
         this.x = canvas.width;
@@ -33,48 +43,141 @@ class Raven {
         this.maxFrame = 4;
         this.timeSinceFlap = 0;
         this.flapInterval = Math.random() * 50 + 50;
+
+        // collision Canvas
+        this.randomColors = [Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)];
+        this.color = 'rgb(' + this.randomColors[0] + ',' + this.randomColors[1]
+            + ',' + this.randomColors[2] + ')';
     }
     update(deltaTime) {
-        this.x -= this.directionX;
+        // top and bottom bounce effect
+        if (this.y < 0 || this.y > canvas.height - this.height) {
+            this.directionY = this.directionY * -1;
+        }
 
-        if(this.x < 0 - this.width) {
+        this.x -= this.directionX;
+        this.y += this.directionY;
+        if (this.x < 0 - this.width) {
             this.markedForDeletion = true;
         }
 
         this.timeSinceFlap += deltaTime;
-        if(this.timeSinceFlap > this.flapInterval) {
-            if(this.frame > this.maxFrame) {
+        if (this.timeSinceFlap > this.flapInterval) {
+            if (this.frame > this.maxFrame) {
                 this.frame = 0;
             }
             else {
                 this.frame++;
             }
             this.timeSinceFlap = 0;
-        }        
+        }
+        // gameover
+        if(this.x < 0 - this.width) gameOver = true;
     }
     draw() {
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
-        ctx.drawImage(this.image, this.frame*this.spriteWidth, 0, this.spriteWidth, this.spriteHeight,
-         this.x, this.y, this.width, this.height);
+        collisionCtx.fillStyle = this.color;
+        collisionCtx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.drawImage(this.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight,
+            this.x, this.y, this.width, this.height);
     }
 }
+
+//explosion effect
+let explosions = [];
+class Explosion {
+    constructor(x, y, size) {
+        this.image = new Image();
+        this.image.src = './images/boom.png';
+        this.spriteWidth = 200;
+        this.spriteHeight = 179;
+        this.size = size;
+        this.x = x;
+        this.y = y;
+        this.frame = 0;
+        this.sound = new Audio();
+        this.sound.src = './audio/boom.wav';
+
+        this.timeSinceLastFrame = 0;
+        this.frameInterval = 200;
+        this.markedForDeletion = false;
+    }
+    update(deltatime) {
+        if (this.frame === 0) {
+            this.sound.play();
+        }
+        this.timeSinceLastFrame += deltatime;
+        if (this.timeSinceLastFrame > this.frameInterval) {
+            this.frame++;
+            this.timeSinceLastFrame = 0;
+            if (this.frame > 5) {
+                this.markedForDeletion = true;
+            }
+        }
+
+    }
+    draw() {
+        ctx.drawImage(this.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight,
+             this.x, this.y - this.size / 4, this.size, this.size);
+    }
+}
+
+function drawScore() {
+    ctx.fillStyle = 'black';
+    ctx.fillText('Score: ' + score, 50, 75);
+    ctx.fillStyle = 'white';
+    ctx.fillText('Score: ' + score, 55, 80);
+}
+
+function drawGameOver() {
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'black';
+    ctx.fillText('GAME OVER, your score is ' + score, canvas.width/2, canvas.height/2);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'red';
+    ctx.fillText('GAME OVER, your score is ' + score, canvas.width/2, canvas.height/2 +5);
+}
+
+window.addEventListener('click', function (e) {
+    const detectPixelColor = collisionCtx.getImageData(e.x, e.y, 1, 1);
+    const pc = detectPixelColor.data;                       // 
+    ravens.forEach(object => {
+        if (object.randomColors[0] === pc[0] && object.randomColors[1] === pc[1]
+            && object.randomColors[2] === pc[2]) {
+            // collision detected
+            object.markedForDeletion = true;
+            score++;
+            explosions.push(new Explosion(object.x, object.y, object.width));
+        }
+    })
+});
 // test entity animation
 // const raven = new Raven();
 
 function animate(timeStamp) {
-    ctx.clearRect(0,0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    collisionCtx.clearRect(0, 0, canvas.width, canvas.height);
 
     // one way to trigger periodic events through timestamps
     let deltaTime = timeStamp - lastTime;
     lastTime = timeStamp;
     timeToNextRaven += deltaTime;
-    if(timeToNextRaven > ravenInterval) {
+    if (timeToNextRaven > ravenInterval) {
         ravens.push(new Raven());
         timeToNextRaven = 0;
+        ravens.sort(function (a, b) {
+            return a.width - b.width;       // ascending order, small ravens built first
+        });
     };
-    [...ravens].forEach(object => object.update(deltaTime));                   // array literal, spread operator
-    [...ravens].forEach(object => object.draw());                     // array literal, spread operator
+    drawScore();
+    [...ravens, ...explosions].forEach(object => object.update(deltaTime));                   // array literal, spread operator
+    [...ravens, ...explosions].forEach(object => object.draw());                     // array literal, spread operator
     ravens = ravens.filter(object => !object.markedForDeletion)     // take ravens variable and replace with same array filled only objects if true
-    requestAnimationFrame(animate);                                 // callback function
+    explosions = explosions.filter(object => !object.markedForDeletion)
+    if(!gameOver) {
+        requestAnimationFrame(animate);                                 // callback function
+    }
+    else {
+        drawGameOver();
+    }
 }
 animate(0);
