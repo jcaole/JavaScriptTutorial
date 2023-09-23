@@ -1,9 +1,13 @@
 #canvas1 {
-    border: 3px solid black;
+    border: 3px solid white;
+    background: gray;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     height: 1000px;
     width: 500px;
+}
+html {
+    background: gray;
 }
