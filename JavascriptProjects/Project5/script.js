@@ -24,7 +24,7 @@ class Raven {
     constructor() {
         this.spriteWidth = 271;
         this.spriteHeight = 194;
-        this.sizeModifier = Math.random() * 0.2 + 1;
+        this.sizeModifier = Math.random() * 0.1 + .8;
         this.width = this.spriteWidth * this.sizeModifier;
         this.height = this.spriteHeight * this.sizeModifier;
         this.x = canvas.width;
@@ -48,6 +48,9 @@ class Raven {
         this.randomColors = [Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)];
         this.color = 'rgb(' + this.randomColors[0] + ',' + this.randomColors[1]
             + ',' + this.randomColors[2] + ')';
+
+        // particle trail per raven
+        this.hasTrail = Math.random() > 0.3;
     }
     update(deltaTime) {
         // top and bottom bounce effect
@@ -70,6 +73,12 @@ class Raven {
                 this.frame++;
             }
             this.timeSinceFlap = 0;
+            // handles particle trail per raven
+            if(this.hasTrail) {
+                for(let i = 0; i < 5; i++) {
+                    particles.push(new Particles(this.x, this.y, this.width, this.color));
+                }
+            }
         }
         // gameover
         if(this.x < 0 - this.width) gameOver = true;
@@ -121,6 +130,38 @@ class Explosion {
     }
 }
 
+// template to create particles
+let particles = [];
+class Particles {
+    constructor(x, y, size, color) {
+        this.size = size;
+        this.x = x + this.size / 2 + Math.random() * 50 - 25;
+        this.y = y + this.size / 3 + Math.random() * 50 - 25;
+
+        this.radius = Math.random() * this.size / 10;
+        this.maxRadius = Math.random() * 20 + 35;
+        this.markedForDeletion = false;
+        this.speedX = Math.random() * 1 + 0.5;
+        this.color = color;
+    }
+    update() {
+        this.x += this.speedX;
+        this.radius += 0.5;
+        if (this.radius > this.maxRadius - 5) { // Corrected typo here
+            this.markedForDeletion = true;
+        }
+    }
+    draw() {
+        ctx.save(); // helps with global overflow
+        ctx.globalAlpha = 1 - this.radius / this.maxRadius; // animate opacity of trail
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore(); // helps with global overflow
+    }
+}
+
 function drawScore() {
     ctx.fillStyle = 'black';
     ctx.fillText('Score: ' + score, 50, 75);
@@ -169,10 +210,11 @@ function animate(timeStamp) {
         });
     };
     drawScore();
-    [...ravens, ...explosions].forEach(object => object.update(deltaTime));                   // array literal, spread operator
-    [...ravens, ...explosions].forEach(object => object.draw());                     // array literal, spread operator
-    ravens = ravens.filter(object => !object.markedForDeletion)     // take ravens variable and replace with same array filled only objects if true
-    explosions = explosions.filter(object => !object.markedForDeletion)
+    [...particles, ...ravens, ...explosions].forEach(object => object.update(deltaTime));                   // array literal, spread operator
+    [...particles, ...ravens, ...explosions].forEach(object => object.draw());                     // array literal, spread operator
+    ravens = ravens.filter(object => !object.markedForDeletion);     // take ravens variable and replace with same array filled only objects if true
+    explosions = explosions.filter(object => !object.markedForDeletion);
+    particles = particles.filter(object => !object.markedForDeletion);
     if(!gameOver) {
         requestAnimationFrame(animate);                                 // callback function
     }
