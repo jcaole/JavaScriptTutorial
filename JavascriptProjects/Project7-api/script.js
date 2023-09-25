@@ -9,6 +9,8 @@ window.addEventListener('load', function () {
 
     let gameOver = false;
 
+    const fullScreenButton = document.getElementById('fullScreenButton');
+
     class InputHandler {
         constructor() {
             // add and remove keyboard inputs in a game
@@ -91,10 +93,12 @@ window.addEventListener('load', function () {
         }
         draw(context) {
             //collision
-            // context.strokeStyle = 'white';
-            // context.beginPath();
-            // context.arc(this.x + this.width/2, this.y + this.height/2, this.width/2, 0, Math.PI * 2);
-            // context.stroke();
+            context.lineWidth = 5;
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.arc(this.x + this.width/2, this.y + this.height/2, this.width/2, 0, Math.PI * 2);
+            context.stroke();
+            
 
             context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
         }
@@ -225,11 +229,12 @@ window.addEventListener('load', function () {
         }
         draw(context) {
             //collision
-            // context.strokeStyle = 'white';
-            // context.beginPath();
-            // context.arc(this.x + this.width/2, this.y + this.height/2, this.width/2, 0, Math.PI * 2);
-            // context.stroke();
-
+            context.lineWidth = 5;
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.arc(this.x + this.width/2, this.y + this.height/2, this.width/2, 0, Math.PI * 2);
+            context.stroke();
+            
             context.drawImage(this.image, this.frameX * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
 
         }
@@ -296,6 +301,23 @@ window.addEventListener('load', function () {
         gameOver = false;
         animate(0);
     }
+
+    function toggleFullScreen() {
+        console.log(document.fullscreenElement);
+        if(!document.fullscreenElement) {
+            
+            // error popup window
+            // canvas.requestFullscreen().then.catch();
+            canvas.requestFullscreen().catch(err => {
+                alert(`Error, can't enable full-screen mode: ${err.message}`);
+            });
+
+        }
+        else {
+            document.exitFullscreen();
+        }
+    }
+    fullScreenButton.addEventListener('click', toggleFullScreen);
 
     // instantiate variables
     const input = new InputHandler();
