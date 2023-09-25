@@ -16,7 +16,7 @@ window.addEventListener('load', function () {
 
             // touch screen variables
             this.touchY = '';
-            this.touchTreshold = 30;        //30px apart
+            this.touchTreshold = 30;        //30px apart for swipe
             window.addEventListener('keydown', e => {
                 if ((e.key === 'ArrowDown' ||
                     e.key === 'ArrowUp' ||
@@ -38,14 +38,24 @@ window.addEventListener('load', function () {
                 }
             });
             window.addEventListener('touchstart', e => {
-                console.log(e.changedTouches[0].pageY);
                 this.touchY = e.changedTouches[0].pageY;
             });
             window.addEventListener('touchmove', e => {
-                console.log(e.changedTouches[0].pageY);
+                const swipeDistance = e.changedTouches[0].pageY - this.touchY;
+                if(swipeDistance < -this.touchTreshold && this.keys.indexOf('swipe up') === -1) {
+                    this.keys.push('swipe up');
+                } 
+                else if(swipeDistance > this.touchTreshold && this.keys.indexOf('swipe down') === -1) {
+                    this.keys.push('swipe down');
+                    if(gameOver) {
+                        restartGame();
+                    }
+                }
             });
             window.addEventListener('touchend', e => {
-                console.log(e.changedTouches[0].pageY);
+                console.log(this.keys);
+                this.keys.splice(this.keys.indexOf('swipe up'), 1);
+                this.keys.splice(this.keys.indexOf('swipe down'), 1);
             });
         }
     }
@@ -119,7 +129,7 @@ window.addEventListener('load', function () {
             else if (input.keys.indexOf('ArrowLeft') > -1) {
                 this.speed = -5;
             }
-            else if (input.keys.indexOf('ArrowUp') > -1 && this.onGround()) {
+            else if ((input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('swipe up') > -1) && this.onGround()) {
                 this.vy -= 32;      // distance of initial vertical movement
             }
             else {
