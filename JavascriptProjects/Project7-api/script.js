@@ -33,6 +33,15 @@ window.addEventListener('load', function () {
                     this.keys.splice(this.keys.indexOf(e.key), 1);
                 }
             });
+            window.addEventListener('touchstart', e => {
+                console.log('start');
+            });
+            window.addEventListener('touchmove', e => {
+                console.log('moving');
+            });
+            window.addEventListener('touchend', e => {
+                console.log('end');
+            });
         }
     }
 
