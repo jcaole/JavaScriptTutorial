@@ -14,45 +14,92 @@ document.addEventListener('DOMContentLoaded', function () {
             this.enemies = [];
             this.enemyInterval = 1000;
             this.enemyTimer = 0;
+            this.enemyTypes = ['worm', 'ghost'];
         }
         update(deltaTime) {
             this.enemies = this.enemies.filter(object => !object.markedForDeletion);
-            if(this.enemyTimer > this.enemyInterval) {
+            if (this.enemyTimer > this.enemyInterval) {
                 this.#addNewEnemy();
                 this.enemyTimer = 0;
             } else {
-                this.enemyTimer+= deltaTime;
+                this.enemyTimer += deltaTime;
             }
-            this.enemies.forEach(object => object.update());
+            this.enemies.forEach(object => object.update(deltaTime));
         }
         draw() {
             this.enemies.forEach(object => object.draw(this.ctx));
         }
         // private class method
         #addNewEnemy() {
-            this.enemies.push(new Enemy(this));
+            const randomEnemy = this.enemyTypes[Math.floor(Math.random() * this.enemyTypes.length)];
+            if(randomEnemy == 'worm') {
+                this.enemies.push(new Worm(this));
+            }
+            else {
+                this.enemies.push(new Ghost(this));
+            }
+            this.enemies.push(new Worm(this));
+            // ascending sort to clean up entity layer heiarchy
+            this.enemies.sort(function(a,b) {
+                return a.y - b.y;
+            });
         }
     }
 
     class Enemy {
         constructor(game) {
             this.game = game;
-            console.log(this.game);
-            this.x = this.game.width;
-            this.y = Math.random() * this.game.height;
-            this.width = 100;
-            this.height = 100;
+            // console.log(this.game);
             this.markedForDeletion = false;
         }
-        update() {
-            this.x--;
+        update(deltaTime) {
+            this.x -= this.vx * deltaTime;
             // remove enemies
-            if(this.x < 0 - this.width) {
+            if (this.x < 0 - this.width) {
                 this.markedForDeletion = true;
             }
         }
         draw(ctx) {
-            ctx.fillRect(this.x, this.y, this.width, this.height);
+            // ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.drawImage(this.image, 0, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
+        }
+    }
+
+    class Worm extends Enemy {
+        constructor(game) {
+            super(game);
+            // widthOfSheet / numOfFrames
+            this.spriteWidth = 229;
+            // heightOfSpreadSheet / numOfFrames
+            this.spriteHeight = 171;
+
+            this.width = this.spriteWidth / 2;
+            this.height = this.spriteHeight / 2;
+
+            this.x = this.game.width;
+            this.y = Math.random() * this.game.height;
+            this.image = worm;
+
+            this.vx = Math.random() * 0.1 + 0.1;
+        }
+    }
+
+    class Ghost extends Enemy {
+        constructor(game) {
+            super(game);
+            // widthOfSheet / numOfFrames
+            this.spriteWidth = 261;
+            // heightOfSpreadSheet / numOfFrames
+            this.spriteHeight = 209;
+
+            this.width = this.spriteWidth / 2;
+            this.height = this.spriteHeight / 2;
+
+            this.x = this.game.width;
+            this.y = Math.random() * this.game.height;
+            this.image = ghost;
+
+            this.vx = Math.random() * 0.3 + 0.1;
         }
     }
 
@@ -62,10 +109,10 @@ document.addEventListener('DOMContentLoaded', function () {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const deltaTime = timeStamp - lastTime;
         lastTime = timeStamp;
-    
+
         game.update(deltaTime);
         game.draw();
-    
+
         requestAnimationFrame(animate);
     }
     animate(0);
