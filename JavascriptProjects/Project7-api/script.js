@@ -282,9 +282,9 @@ window.addEventListener('load', function () {
         if (gameOver) {
             context.textAlign = 'center';
             context.fillStyle = 'black';
-            context.fillText('GAME OVER, Press Enter to Try Again!', canvas.width / 2, 300);
+            context.fillText('GAME OVER, Press Enter or Swipe Down to Try Again!', canvas.width / 2, 300);
             context.fillStyle = 'red';
-            context.fillText('GAME OVER, Press Enter to Try Again!', canvas.width / 2, 304);
+            context.fillText('GAME OVER, Press Enter or Swipe Down to Try Again!', canvas.width / 2, 304);
         }
     }
 
