@@ -13,6 +13,10 @@ window.addEventListener('load', function () {
         constructor() {
             // add and remove keyboard inputs in a game
             this.keys = [];
+
+            // touch screen variables
+            this.touchY = '';
+            this.touchTreshold = 30;        //30px apart
             window.addEventListener('keydown', e => {
                 if ((e.key === 'ArrowDown' ||
                     e.key === 'ArrowUp' ||
@@ -34,13 +38,14 @@ window.addEventListener('load', function () {
                 }
             });
             window.addEventListener('touchstart', e => {
-                console.log('start');
+                console.log(e.changedTouches[0].pageY);
+                this.touchY = e.changedTouches[0].pageY;
             });
             window.addEventListener('touchmove', e => {
-                console.log('moving');
+                console.log(e.changedTouches[0].pageY);
             });
             window.addEventListener('touchend', e => {
-                console.log('end');
+                console.log(e.changedTouches[0].pageY);
             });
         }
     }
