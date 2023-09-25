@@ -94,13 +94,6 @@ window.addEventListener('load', function () {
         draw(context) {        
             // draw sprite
             context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
-
-            //collision visualization
-            context.lineWidth = 5;
-            context.strokeStyle = 'white';
-            context.beginPath();
-            context.arc(this.x + this.width/2, this.y + this.height/2 + 20, this.width/3, 0, Math.PI * 2);
-            context.stroke();
         }
         update(input, deltaTime, enemies) {
             // collision detection
@@ -232,13 +225,6 @@ window.addEventListener('load', function () {
         draw(context) {
             // draw sprite
             context.drawImage(this.image, this.frameX * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
-            
-            //collision visualization
-            context.lineWidth = 5;
-            context.strokeStyle = 'white';
-            context.beginPath();
-            context.arc(this.x + this.width/2 - 20, this.y + this.height/2, this.width/3, 0, Math.PI * 2);
-            context.stroke();
         }
         update(deltaTime) {
             if (this.frameTimer > this.frameInterval) {
