@@ -105,7 +105,7 @@ window.addEventListener('load', function () {
         update(input, deltaTime, enemies) {
             // collision detection
             enemies.forEach(enemy => {
-                const dx = (enemy.x + enemy.width / 2) - (this.x + this.width / 2 + 20);     // corrected offset for white hitboxes
+                const dx = (enemy.x + enemy.width / 2 - 20) - (this.x + this.width / 2);     // corrected offset for white hitboxes
                 const dy = (enemy.y + enemy.height / 2) - (this.y + this.height / 2 + 20);   // corrected offset for white hitboxes | added +20 to match collision visualization
                 const distance = Math.sqrt(dx * dx + dy * dy);      //pythagorean thereom
                 
