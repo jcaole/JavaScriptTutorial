@@ -92,11 +92,11 @@ window.addEventListener('load', function () {
             this.maxFrame = 8;
         }
         draw(context) {
-            //collision
+            //collision visualization
             context.lineWidth = 5;
             context.strokeStyle = 'white';
             context.beginPath();
-            context.arc(this.x + this.width/2, this.y + this.height/2, this.width/2, 0, Math.PI * 2);
+            context.arc(this.x + this.width/2, this.y + this.height/2 + 20, this.width/3, 0, Math.PI * 2);
             context.stroke();
             
 
@@ -106,9 +106,11 @@ window.addEventListener('load', function () {
             // collision detection
             enemies.forEach(enemy => {
                 const dx = (enemy.x + enemy.width / 2) - (this.x + this.width / 2);     // corrected offset for white hitboxes
-                const dy = (enemy.y + enemy.height / 2) - (this.y + this.height / 2);   // corrected offset for white hitboxes
+                const dy = (enemy.y + enemy.height / 2) - (this.y + this.height / 2 + 20);   // corrected offset for white hitboxes | added +20 to match collision visualization
                 const distance = Math.sqrt(dx * dx + dy * dy);      //pythagorean thereom
-                if (distance < enemy.width / 2 + this.width / 2) {
+                
+                // changes hit boxes for both player and enemy
+                if (distance < enemy.width / 2 + this.width / 3) {      // updated to match collision visualization
                     gameOver = true;
                 }
             });
@@ -228,7 +230,7 @@ window.addEventListener('load', function () {
             this.markedForDeletion = false;
         }
         draw(context) {
-            //collision
+            //collision visualization
             context.lineWidth = 5;
             context.strokeStyle = 'white';
             context.beginPath();
@@ -334,7 +336,7 @@ window.addEventListener('load', function () {
         lastTime = timeStamp;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         background.draw(ctx);                               // draw background first before other objects
-        // background.update();
+        background.update();
         player.draw(ctx);
         player.update(input, deltaTime, enemies);
 
