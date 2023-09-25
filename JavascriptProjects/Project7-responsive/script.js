@@ -91,26 +91,26 @@ window.addEventListener('load', function () {
             this.frameY = 0;
             this.maxFrame = 8;
         }
-        draw(context) {
+        draw(context) {        
+            // draw sprite
+            context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
+
             //collision visualization
             context.lineWidth = 5;
             context.strokeStyle = 'white';
             context.beginPath();
             context.arc(this.x + this.width/2, this.y + this.height/2 + 20, this.width/3, 0, Math.PI * 2);
             context.stroke();
-            
-
-            context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
         }
         update(input, deltaTime, enemies) {
             // collision detection
             enemies.forEach(enemy => {
-                const dx = (enemy.x + enemy.width / 2) - (this.x + this.width / 2);     // corrected offset for white hitboxes
+                const dx = (enemy.x + enemy.width / 2) - (this.x + this.width / 2 + 20);     // corrected offset for white hitboxes
                 const dy = (enemy.y + enemy.height / 2) - (this.y + this.height / 2 + 20);   // corrected offset for white hitboxes | added +20 to match collision visualization
                 const distance = Math.sqrt(dx * dx + dy * dy);      //pythagorean thereom
                 
                 // changes hit boxes for both player and enemy
-                if (distance < enemy.width / 2 + this.width / 3) {      // updated to match collision visualization
+                if (distance < enemy.width / 3 + this.width / 3) {      // updated to match collision visualization
                     gameOver = true;
                 }
             });
@@ -230,15 +230,15 @@ window.addEventListener('load', function () {
             this.markedForDeletion = false;
         }
         draw(context) {
+            // draw sprite
+            context.drawImage(this.image, this.frameX * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+            
             //collision visualization
             context.lineWidth = 5;
             context.strokeStyle = 'white';
             context.beginPath();
-            context.arc(this.x + this.width/2, this.y + this.height/2, this.width/2, 0, Math.PI * 2);
+            context.arc(this.x + this.width/2 - 20, this.y + this.height/2, this.width/3, 0, Math.PI * 2);
             context.stroke();
-            
-            context.drawImage(this.image, this.frameX * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height);
-
         }
         update(deltaTime) {
             if (this.frameTimer > this.frameInterval) {
