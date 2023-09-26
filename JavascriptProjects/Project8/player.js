@@ -4,11 +4,13 @@
 * Description: logic for control and animation of player entity
 */
 
+import { StandingLeft, StandingRight } from "./state.js";
+
 export default class Player {
     constructor(gameWidth, gameHeight) {
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
-        this.states = [];
+        this.states = [new StandingLeft(this), new StandingRight(this)];
         this.currentState = this.states[0];
         this.image = document.getElementById('dogImage');
         this.width = 200;
@@ -22,7 +24,12 @@ export default class Player {
     draw(context) {
         context.drawImage(this.image, this.width * this.frameX, this.height * this.frameY, this.width, this.height, this.x, this.y, this.width, this.height);
     }
-    update() {
-
+    update(input) {
+        this.currentState.handleInput(input);
     }
+    setState(state) {
+        this.currentState = this.states[state];
+        this.currentState.enter();
+    }
+    
 }
