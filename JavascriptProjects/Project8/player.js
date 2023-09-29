@@ -4,7 +4,7 @@
 * Description: logic for control and animation of player entity
 */
 
-import { StandingLeft, StandingRight, SittingLeft, SittingRight, RunningLeft, RunningRight, JumpingLeft, JumpingRight } from "./state.js";
+import { StandingLeft, StandingRight, SittingLeft, SittingRight, RunningLeft, RunningRight, JumpingLeft, JumpingRight, FallingLeft, FallingRight } from "./state.js";
 
 export default class Player {
     constructor(gameWidth, gameHeight) {
@@ -12,7 +12,7 @@ export default class Player {
         this.gameHeight = gameHeight;
         this.states = [new StandingLeft(this), new StandingRight(this),
         new SittingLeft(this), new SittingRight(this), new RunningLeft(this), new RunningRight(this),
-        new JumpingLeft(this), new JumpingRight(this)];
+        new JumpingLeft(this), new JumpingRight(this), new FallingLeft(this), new FallingRight(this)];
         this.currentState = this.states[1];
         this.image = document.getElementById('dogImage');
         this.width = 200;
@@ -26,11 +26,21 @@ export default class Player {
         this.frameX = 0;
         this.frameY = 0;
 
+        this.maxFrame = 6;  // number of frames in sprite sheet
+
         this.speed = 0;
         this.maxSpeed = 10;
 
     }
     draw(context) {
+        // draw different frames to animate sprite
+        if(this.frameX < this.maxFrame) {
+            this.frameX++;
+        }
+        else {
+            this.frameX = 0;
+        }
+
         context.drawImage(this.image, this.width * this.frameX, this.height * this.frameY, this.width, this.height, this.x, this.y, this.width, this.height);
     }
     update(input) {
@@ -52,6 +62,11 @@ export default class Player {
         }
         else {
             this.vy = 0;
+        }
+
+        // player cannot clip through floor
+        if(this.y > this.gameHeight - this.height) {
+            this.y = this.gameHeight - this.height;
         }
 
     }

@@ -13,6 +13,8 @@ export const states = {
     RUNNING_RIGHT: 5,
     JUMPING_LEFT: 6,
     JUMPING_RIGHT: 7,
+    FALLING_LEFT: 8,
+    FALLING_RIGHT: 9,
 
 }
 
@@ -28,6 +30,7 @@ export class StandingLeft extends State {
         this.player = player;
     }
     enter() {
+        this.maxFrame = 6;
         this.player.frameY = 1;
         this.player.speed = 0;
     }
@@ -53,6 +56,7 @@ export class StandingRight extends State {
         this.player = player;
     }
     enter() {
+        this.maxFrame = 6;
         this.player.frameY = 0;
         this.player.speed = 0;
     }
@@ -78,6 +82,7 @@ export class SittingLeft extends State {
         this.player = player;
     }
     enter() {
+        this.maxFrame = 4;
         this.player.frameY = 9;
         this.player.speed = 0;
     }
@@ -97,6 +102,7 @@ export class SittingRight extends State {
         this.player = player;
     }
     enter() {
+        this.maxFrame = 4;
         this.player.frameY = 8;
         this.player.speed = 0;
     }
@@ -116,6 +122,7 @@ export class RunningLeft extends State {
         this.player = player;
     }
     enter() {
+        this.maxFrame = 8;
         this.player.frameY = 7;
         this.player.speed = -this.player.maxSpeed;
     }
@@ -138,6 +145,7 @@ export class RunningRight extends State {
         this.player = player;
     }
     enter() {
+        this.maxFrame = 8;
         this.player.frameY = 6;
         this.player.speed = this.player.maxSpeed;
     }
@@ -160,9 +168,10 @@ export class JumpingLeft extends State {
         this.player = player;
     }
     enter() {
+        this.maxFrame = 6;
         this.player.frameY = 3;
         if (this.player.onGround()) {
-            this.player.vy -= 30;
+            this.player.vy -= 20;
         }
         this.player.speed = -this.player.maxSpeed * 0.5;
 
@@ -174,6 +183,9 @@ export class JumpingLeft extends State {
         else if(this.player.onGround()) {
             this.player.setState(states.STANDING_LEFT);
         }
+        else if(this.player.vy > 0) {
+            this.player.setState(states.FALLING_LEFT);
+        }
     }
 }
 
@@ -183,9 +195,10 @@ export class JumpingRight extends State {
         this.player = player;
     }
     enter() {
+        this.maxFrame = 6;
         this.player.frameY = 2;
         if (this.player.onGround()) {
-            this.player.vy -= 30;
+            this.player.vy -= 20;
         }
         this.player.speed = this.player.maxSpeed * 0.5;
 
@@ -193,6 +206,46 @@ export class JumpingRight extends State {
     handleInput(input) {
         if (input === 'PRESS left') {
             this.player.setState(states.JUMPING_LEFT);
+        }
+        else if(this.player.onGround()) {
+            this.player.setState(states.STANDING_RIGHT);
+        }
+        else if(this.player.vy > 0) {
+            this.player.setState(states.FALLING_RIGHT);
+        }
+    }
+}
+
+export class FallingLeft extends State {
+    constructor(player) {
+        super('FALLING LEFT');
+        this.player = player;
+    }
+    enter() {
+        this.maxFrame = 6;
+        this.player.frameY = 5;
+    }
+    handleInput(input) {
+        if (input === 'PRESS right') {
+            this.player.setState(states.FALLING_RIGHT);
+        }
+        else if(this.player.onGround()) {
+            this.player.setState(states.STANDING_LEFT);
+        }
+    }
+}
+export class FallingRight extends State {
+    constructor(player) {
+        super('FALLING RIGHT');
+        this.player = player;
+    }
+    enter() {
+        this.maxFrame = 6;
+        this.player.frameY = 4;
+    }
+    handleInput(input) {
+        if (input === 'PRESS left') {
+            this.player.setState(states.FALLING_LEFT);
         }
         else if(this.player.onGround()) {
             this.player.setState(states.STANDING_RIGHT);
