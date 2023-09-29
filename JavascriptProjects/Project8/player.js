@@ -31,16 +31,26 @@ export default class Player {
         this.speed = 0;
         this.maxSpeed = 10;
 
+        //helper variables for deltatime
+        this.fps = 30;
+        this.frameTimer = 0;
+        this.frameInterval = 1000 / this.fps;
+
     }
-    draw(context) {
-        // draw different frames to animate sprite
-        if(this.frameX < this.maxFrame) {
-            this.frameX++;
+    draw(context, deltaTime) {
+        if (this.frameTimer > this.frameInterval) {
+            // draw different frames to animate sprite
+            if (this.frameX < this.maxFrame) {
+                this.frameX++;
+            }
+            else {
+                this.frameX = 0;
+            }
+            this.frameTimer = 0;
         }
         else {
-            this.frameX = 0;
+            this.frameTimer += deltaTime;
         }
-
         context.drawImage(this.image, this.width * this.frameX, this.height * this.frameY, this.width, this.height, this.x, this.y, this.width, this.height);
     }
     update(input) {
@@ -65,7 +75,7 @@ export default class Player {
         }
 
         // player cannot clip through floor
-        if(this.y > this.gameHeight - this.height) {
+        if (this.y > this.gameHeight - this.height) {
             this.y = this.gameHeight - this.height;
         }
 
